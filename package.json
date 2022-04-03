@@ -1,0 +1,33 @@
+{
+    "name": "yaskawa-markup-language-support",
+    "displayName": "YASKAWA Markup Language (YML) Support",
+    "description": "Support YML for YASKAWA Motoman",
+    "publisher": "tshikina",
+    "icon": "images/icon.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tshikina/YaskawaMarkupLanguageSupport.git"
+    },
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.63.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "yml",
+            "aliases": ["yml", "YML for YASKAWA Motoman"],
+            "extensions": [".yml"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "yml",
+            "scopeName": "source.yml",
+            "path": "./syntaxes/yml.tmLanguage.json"
+        }],
+        "snippets": [
+        ]
+    }
+}

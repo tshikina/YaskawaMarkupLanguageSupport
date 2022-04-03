@@ -1,0 +1,100 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "INFORM JBI for YASKAWA Motoman",
+	"patterns": [
+		{ "include": "#blockcomment" },
+		{ "include": "#linecomment" },
+		{ "include": "#classdefine" },
+		{ "include": "#classblock" },
+		{ "include": "#metainst" },
+		{ "include": "#metaargname" },
+		{ "include": "#metajobname" },
+		{ "include": "#metapositions" },
+		{ "include": "#metaheader" }
+	],
+	"repository": {
+		"blockcomment": {
+			"begin": "/\\*",
+			"end": "\\*/",
+			"name": "comment.block.yml"
+		},
+		"linecomment": {
+			"match": "//.*",
+			"name": "comment.line.yml"
+		},
+		"doublequotedstrings": {
+			"name": "string.quoted.double.yml",
+			"begin": "\"",
+			"end": "\""
+		},
+		"singlequotedstrings": {
+			"name": "string.quoted.single.yml",
+			"begin": "'",
+			"end": "'"
+		},
+		"classdefine": {
+			"match": "([A-Z][A-Za-z0-9_]*)\\s*:\\s*([A-Z][A-Za-z0-9_]*)",
+			"captures": {
+				"1": { "name": "entity.name.type.class.yml" },
+				"2": { "name": "entity.other.inherited-class.yml" }
+			}
+		},
+		"classblock": {
+			"begin": "{",
+			"end": "}",
+			"patterns": [
+				{ "include": "#blockcomment" },
+				{ "include": "#linecomment" },
+				{ "include": "#instance" },
+				{ "include": "#classblock" },
+				{ "include": "#newproperty" },
+				{ "include": "#newid" },
+				{ "include": "#doublequotedstrings" },
+				{ "include": "#singlequotedstrings" },
+				{ "include": "#floatvalues" },
+				{ "include": "#decimalvalues" },
+				{ "include": "#properties" }
+			]
+		},
+		"instance": {
+			"match": "[A-Z][A-Za-z0-9]*",
+			"name": "entity.name.type.class.yml"
+		},
+		"newproperty": {
+			"match": "\\b(property\\s+(bool|int|real|string|map|array))\\s+(\\S+)\\s*:",
+			"captures": {
+				"1": { "name": "storage.type.yml" },
+				"3": { "patterns": [{"include": "#propertyname"}] }
+			}
+		},
+		"newid": {
+			"match": "\\b(id)\\s*:\\s*(\\S+)\\b",
+			"captures": {
+				"1": { "name": "storage.type.yml" },
+				"2": { "patterns": [{"include": "#propertyname"}] }
+			}
+		},
+		"properties": {
+			"match": "\\b[a-z][A-Za-z0-9_]*\\b",
+			"name": "variable.other.yml"
+		},
+		"propertyname": {
+			"patterns": [ {
+					"match": "\\b[a-z][A-Za-z0-9_]*\\b",
+					"name": "variable.other.yml"
+				}, {
+					"match": "\\b\\S+\\b",
+					"name": "invalid.illegal.propertyname.yml"
+				}
+			] },
+		"decimalvalues": {
+			"match": "\\b[-]?[1-9]*[0-9]+\\b",
+			"name": "constant.numeric.decimal.yml"
+		},
+		"floatvalues": {
+			"match": "\\b[-]?[0-9]+\\.[0-9]+\\b",
+			"name": "constant.numeric.float.yml"
+		}
+	},
+	"scopeName": "source.yml"
+}
