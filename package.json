@@ -1,7 +1,7 @@
 {
     "name": "yaskawa-markup-language-support",
     "displayName": "YASKAWA Markup Language (YML) Support",
-    "description": "Support YML for YASKAWA Motoman",
+    "description": "Support YML for Smart Pendant Extension of YASKAWA Motoman",
     "publisher": "tshikina",
     "icon": "images/icon.png",
     "repository": {

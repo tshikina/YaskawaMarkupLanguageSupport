@@ -45,14 +45,17 @@
 			"patterns": [
 				{ "include": "#blockcomment" },
 				{ "include": "#linecomment" },
-				{ "include": "#instance" },
 				{ "include": "#classblock" },
 				{ "include": "#newproperty" },
 				{ "include": "#newid" },
 				{ "include": "#doublequotedstrings" },
 				{ "include": "#singlequotedstrings" },
+				{ "include": "#constants" },
+				{ "include": "#supportconstants" },
+				{ "include": "#supportfunctions" },
 				{ "include": "#floatvalues" },
 				{ "include": "#decimalvalues" },
+				{ "include": "#instance" },
 				{ "include": "#properties" }
 			]
 		},
@@ -87,6 +90,30 @@
 					"name": "invalid.illegal.propertyname.yml"
 				}
 			] },
+		"constants": {
+			"match": "\\b(true|false)\\b",
+			"name": "constant.language.yml"
+		},
+		"supportconstants": {
+			"patterns": [ {
+				"match": "\\bConst\\.\\S+\\b",
+				"name": "support.variable.yml"
+				}, {
+				"match": "\\bparent\\b",
+				"name": "support.variable.yml"
+			} ]
+		},
+		"supportfunctions": {
+			"begin": "\\b(tr)\\(",
+			"end": "\\)",
+			"beginCaptures": {
+				"1":{"name": "support.function.yml"}
+			},
+			"patterns": [
+				{ "include": "#doublequotedstrings" },
+				{ "include": "#singlequotedstrings" }
+			]
+		},
 		"decimalvalues": {
 			"match": "\\b[-]?[1-9]*[0-9]+\\b",
 			"name": "constant.numeric.decimal.yml"

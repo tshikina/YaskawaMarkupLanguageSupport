@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 ### Added
+- Added syntax highlight of "parent" value
+- Added syntax highlight of "Constant" value
+- Added syntax highlight of "true/false" value
+- Added blacket for language configuration
+
 ### Changed
 ### Deprecated
 ### Removed
