@@ -28,6 +28,10 @@
             "path": "./syntaxes/yml.tmLanguage.json"
         }],
         "snippets": [
+            {
+                "language": "yml",
+                "path": "./snippets/yml.code-snippets"
+            }
         ]
     }
 }

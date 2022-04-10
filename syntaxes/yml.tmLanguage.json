@@ -42,6 +42,7 @@
 		"classblock": {
 			"begin": "{",
 			"end": "}",
+			"name": "source.class.yml",
 			"patterns": [
 				{ "include": "#blockcomment" },
 				{ "include": "#linecomment" },

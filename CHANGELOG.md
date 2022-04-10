@@ -10,6 +10,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Added syntax highlight of "Constant" value
 - Added syntax highlight of "true/false" value
 - Added blacket for language configuration
+- Added snippets
 
 ### Changed
 ### Deprecated
