@@ -1,0 +1,484 @@
+{
+    //-----------------
+    // YML new properties
+    "new property bool":{
+        "prefix": "property bool",
+        "body": [
+            "property bool ${1:varName}: ${2|true,false|}",
+        ],
+        "description": "new property bool define"
+    },
+    "new property int":{
+        "prefix": "property int",
+        "body": [
+            "property int ${1:varName}: ${2:0}",
+        ],
+        "description": "new property int define"
+    },
+    "new property real":{
+        "prefix": "property real",
+        "body": [
+            "property real ${1:varName}: ${2:0.0}",
+        ],
+        "description": "new property int define"
+    },
+    "new property string":{
+        "prefix": "property string",
+        "body": [
+            "property string ${1:varName}: \"${2:string}\"",
+        ],
+        "description": "new property string define"
+    },
+    "new property array":{
+        "prefix": "property array",
+        "body": [
+            "property array ${1:varName}: ${2:[]}",
+        ],
+        "description": "new property array define"
+    },
+    "new property map":{
+        "prefix": "property map",
+        "body": [
+            "property map ${1:varName}: ${2:{}}",
+        ],
+        "description": "new property map define"
+    },
+    "new property alias":{
+        "prefix": "property alias",
+        "body": [
+            "property alias ${1:aliaseName}: ${2:aliaseId.aliaseProperty}",
+        ],
+        "description": "new property alias define"
+    },
+
+    //-----------------
+    // YML properties
+    "Const properties":{
+        "prefix": "Const.",
+        "body": [
+            "Const.${1|HalfWidth,FullWidth,QuarterHeight,HalfHeight,FullHeight,Width,Height,Both,Normal,Medium,Bold,Top,Center,Bottom,Left,Right,NoWrap,Wrap,Manual,Auto,Any,On,Off,Monitoring,Operating,Editing,Managing,ManagingSafety,Circle,RectangleStretch,PreserveAspectFit,PreserveAspectCrop,Tile,TileVertically,TileHorizontally,Pad|}",
+        ],
+        "description": "Const properties"
+    },
+
+    "expandBy property":{
+        "prefix": "expandBy: ",
+        "body": [
+            "expandBy: ${1|Const.Width,Const.Height,Const.Both|}",
+        ],
+        "description": "expandBy property"
+    },
+    "collapseBy property":{
+        "prefix": "collapseBy: ",
+        "body": [
+            "collapseBy: ${1|Const.Width,Const.Height,Const.Both|}",
+        ],
+        "description": "collapseBy property"
+    },
+    "fontWeight property":{
+        "prefix": "fontWeight: ",
+        "body": [
+            "fontWeight: ${1|Const.Normal,Const.Medium,Const.Bold|}",
+        ],
+        "description": "fontWeight property"
+    },
+    "valign property":{
+        "prefix": "valign: ",
+        "body": [
+            "valign: ${1|Const.Top,Const.Center,Const.Bottom|}",
+        ],
+        "description": "valign property"
+    },
+    "halign property":{
+        "prefix": "halign: ",
+        "body": [
+            "halign: ${1|Const.Left,Const.Center,Const.Right|}",
+        ],
+        "description": "halign property"
+    },
+    "wrapMode property":{
+        "prefix": "wrapMode: ",
+        "body": [
+            "wrapMode: ${1|Const.NoWrap,Const.Wrap|}",
+        ],
+        "description": "wrapMode property"
+    },
+    "requiredMode property":{
+        "prefix": "requiredMode: ",
+        "body": [
+            "requiredMode: ${1|Const.Manual,Const.Auto,Const.Any|}",
+        ],
+        "description": "requiredMode property"
+    },
+    "requiredServo property":{
+        "prefix": "requiredServo: ",
+        "body": [
+            "requiredServo: ${1|Const.On,Const.Off,Const.Any|}",
+        ],
+        "description": "requiredServo property"
+    },
+    "requiredAccess property":{
+        "prefix": "requiredAccess: ",
+        "body": [
+            "requiredAccess: ${1|Const.Monitoring,Const.Operating,Const.Editing,Const.Managing,Const.ManagingSafety|}",
+        ],
+        "description": "requiredAccess property"
+    },
+    "shape property":{
+        "prefix": "shape: ",
+        "body": [
+            "shape: ${1|Const.Circle,Const.Rectangle|}",
+        ],
+        "description": "shape property"
+    },
+    "fillMode property":{
+        "prefix": "fillMode: ",
+        "body": [
+            "fillMode: ${1|Const.Stretch,Const.PreserveAspectFit,Const.PreserveAspectCrop,Const.Tile,Const.TileVertically,Const.TileHorizontally,Const.Pad|}",
+        ],
+        "description": "fillMode property"
+    },
+    "align property":{
+        "prefix": "align: ",
+        "body": [
+            "align: ${1|Const.Center,Const.Left,Const.Right,Const.Top,Const.Center,Const.Bottom|}",
+        ],
+        "description": "align property"
+    },
+
+
+    //-----------------
+    // YML Items
+    "Item item":{
+        "prefix": "Item {}",
+        "body": [
+            "Item {",
+            "\t$0",
+            "}",
+        ],
+        "description": "Item item"
+    },
+    "Rectangle item":{
+        "prefix": "Rectangle {}",
+        "body": [
+            "Rectangle {",
+            "\twidth: parent.width",
+            "\theight: parent.height",
+            "\tcolor: \"#000000\"",
+            "\t$0",
+            "}",
+        ],
+        "description": "Rectangle item"
+    },
+    "Text item":{
+        "prefix": "Text {}",
+        "body": [
+            "Text {",
+            "\ttext: \"${1:text}\"",
+            "\t$0",
+            "}",
+        ],
+        "description": "Text item"
+    },
+    "Label item":{
+        "prefix": "Label {}",
+        "body": [
+            "Label {",
+            "\ttext: \"${1:text}\"",
+            "\t$0",
+            "}",
+        ],
+        "description": "Label item"
+    },
+    "TextField item": {
+        "prefix": "TextField {}",
+        "body": [
+            "TextField {",
+            "\tlabel: \"${1:label}\"",
+            "\ttext: \"${2:text}\"",
+            "\t// placeholderText: \"placeholderText\"",
+            "\t// units: \"units\"",
+            "\t$0",
+            "\t// numericInput: true",
+            "\t// decimalPlaces: 3",
+            "\t// lowerBound: 0.000",
+            "\t// upperBound: 1.000",
+            "\t",
+            "\t// requiredMode: Const.Manual",
+            "\t// requiredServo: Const.On",
+            "\t// requiredAccess: Const.Managing",
+            "}",
+        ],
+        "description": "TextField item"
+    },
+    "Button item": {
+        "prefix": "Button {}",
+        "body": [
+            "Button {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}Button${RANDOM}}",
+            "\ttext: \"${2:Button Label}\"",
+            "\t$0",
+            "\t// navlink: \"\"",
+            "\t",
+            "\t// requiredMode: Const.Manual",
+            "\t// requiredServo: Const.On",
+            "\t// requiredAccess: Const.Managing",
+            "}",
+        ],
+        "description": "Button item"
+    },
+    "HelpButton item": {
+        "prefix": "HelpButton {}",
+        "body": [
+            "HelpButton {",
+            "\ttitle: \"${1:Help Title}\"",
+            "\thtmlSource: \"${2:help/MyRegisteredHelpFile.html}\"$0",
+            "}",
+        ],
+        "description": "HelpButton item"
+    },
+    "CheckBox item": {
+        "prefix": "CheckBox {}",
+        "body": [
+            "CheckBox {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}CheckBox${RANDOM}}",
+            "\ttext: \"${2:CheckBox Label}\"",
+            "\t$0",
+            "\t// requiredMode: Const.Manual",
+            "\t// requiredServo: Const.On",
+            "\t// requiredAccess: Const.Managing",
+            "}",
+        ],
+        "description": "CheckBox item"
+    },
+    "RadioButton item": {
+        "prefix": "RadioButton {}",
+        "body": [
+            "RadioButton {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}RadioButton${RANDOM}}",
+            "\ttext: \"${2:RadioButton Label}\"",
+            "\t$0",
+            "\t// requiredMode: Const.Manual",
+            "\t// requiredServo: Const.On",
+            "\t// requiredAccess: Const.Managing",
+            "}",
+        ],
+        "description": "RadioButton item"
+    },
+    "ComboBox item": {
+        "prefix": "ComboBox {}",
+        "body": [
+            "ComboBox {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}ComboBox${RANDOM}}",
+            "\toptions: [${2:\"Item1\", \"Item2\", \"Item3\"}]",
+            "\t$0",
+            "\t// requiredMode: Const.Manual",
+            "\t// requiredServo: Const.On",
+            "\t// requiredAccess: Const.Managing",
+            "}",
+        ],
+        "description": "ComboBox item"
+    },
+    "Image item": {
+        "prefix": "Image {}",
+        "body": [
+            "Image {",
+            "\twidth: parent.width",
+            "\theight: parent.height",
+            "\tsource: \"${1:MyRegisteredImage.png}\"",
+            "\tfillMode: Const.PreserveAspectFit$0",
+            "}",
+        ],
+        "description": "Image item"
+    },
+    "Column item": {
+        "prefix": "Column {}",
+        "body": [
+            "Column {",
+            "\t// spacing: 0",
+            "\t// align: Const.Center",
+            "\t$0",
+            "} // Column",
+        ],
+        "description": "Column item"
+    },
+    "Row item": {
+        "prefix": "Row {}",
+        "body": [
+            "Row {",
+            "\t// spacing: 0",
+            "\t// align: Const.Center",
+            "\t$0",
+            "} // Row",
+        ],
+        "description": "Row item"
+    },
+    "Grid item": {
+        "prefix": "Grid {}",
+        "body": [
+            "Grid {",
+            "\t// valign: Const.Center",
+            "\t// halign: Const.Center",
+            "\t// rows: 5",
+            "\t// columns: 5",
+            "\t$0",
+            "} // Grid",
+        ],
+        "description": "Grid item"
+    },
+    "Stack item": {
+        "prefix": "Stack {}",
+        "body": [
+            "Stack {",
+            "\t$0",
+            "} // Stack",
+        ],
+        "description": "Stack item"
+    },
+    "TabBar item": {
+        "prefix": "TabBar {}",
+        "body": [
+            "TabBar {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}TabBar${RANDOM}}",
+            "\tTabButton { text: \"Tab1\" }",
+            "\tTabButton { text: \"Tab2\" }",
+            "\tTabButton { text: \"Tab3\" }",
+            "\t$0",
+            "}",
+        ],
+        "description": "TabBar item"
+    },
+    "TabButton item": {
+        "prefix": "TabButton {}",
+        "body": [
+            "TabButton { text: \"${1:text}\" }",
+        ],
+        "description": "TabButton item"
+    },
+    "TabPanel item": {
+        "prefix": "TabPanel {}",
+        "body": [
+            "TabPanel {",
+            "\tbar: ${1:tabbarId}",
+            "\t$0",
+            "} // TabPanel",
+        ],
+        "description": "TabPanel item"
+    },
+    "Table item": {
+        "prefix": "Table {}",
+        "body": [
+            "Table {",
+            "\twidth: parent.width",
+            "\theight: parent.height",
+            "\t",
+            "\trowSpacing: 0",
+            "\tcolSpacing: 0",
+            "\t",
+            "\t// verticalScroll: true",
+            "\t// horizontalScroll: true",
+            "\t// rowSelectable: true",
+            "\t// cellSelectable: true",
+            "\t// showBorder: true",
+            "\t// showHeadings: true",
+            "\tcolumns: []",
+            "\trows: []",
+            "\t$0",
+            "}",
+        ],
+        "description": "Table item"
+    },
+    "DelegateSelector item": {
+        "prefix": "DelegateSelector {}",
+        "body": [
+            "DelegateSelector {",
+            "\t$0",
+            "}",
+        ],
+        "description": "DelegateSelector item"
+    },
+    "DelegateSelection item": {
+        "prefix": "DelegateSelection {}",
+        "body": [
+            "DelegateSelection {",
+            "\t$0",
+            "}",
+        ],
+        "description": "DelegateSelection item"
+    },
+    "MouseArea item": {
+        "prefix": "MouseArea {}",
+        "body": [
+            "MouseArea {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}MouseArea${RANDOM}}",
+            "\t$0",
+            "}",
+        ],
+        "description": "MouseArea item"
+    },
+
+    "LineChart item": {
+        "prefix": "LineChart {}",
+        "body": [
+            "LineChart {",
+            "\t$0",
+            "}",
+        ],
+        "description": "LineChart item"
+    },
+    "ScatterChart item": {
+        "prefix": "ScatterChart {}",
+        "body": [
+            "ScatterChart {",
+            "\t$0",
+            "}",
+        ],
+        "description": "ScatterChart item"
+    },
+    "BarChart item": {
+        "prefix": "BarChart {}",
+        "body": [
+            "BarChart {",
+            "\t$0",
+            "}",
+        ],
+        "description": "BarChart item"
+    },
+    "PieChart item": {
+        "prefix": "PieChart {}",
+        "body": [
+            "PieChart {",
+            "\t$0",
+            "}",
+        ],
+        "description": "PieChart item"
+    },
+
+    "Utility item": {
+        "prefix": "Utility {}",
+        "body": [
+            "Utility {",
+            "\t// expandCollapseResize: false",
+            "\t// collapsedSize: [Const.HalfWidth, Const.QuarterHeight]",
+            "\t// expandedSize: [Const.FullWidth,Const.HalfHeight]",
+            "\t// expandBy: Const.Both",
+            "\t// collapseBy: Const.Both",
+            "\t// continuousResize: false",
+            "\t// minSize: [Const.HalfWidth, Const.QuarterHeight]",
+            "\t// maxSize: [Const.FullWidth,Const.HalfHeight]",
+            "\t$0",
+            "}",
+        ],
+        "description": "Utility item"
+    },
+    "Panel item": {
+        "prefix": "Panel {}",
+        "body": [
+            "Panel {",
+            "\t$0",
+            "}",
+        ],
+        "description": "Panel item"
+    },
+
+}
