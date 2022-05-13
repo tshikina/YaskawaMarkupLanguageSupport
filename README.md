@@ -1,4 +1,4 @@
-# inform-job-support README
+# YASKAWA Markup Language (YML) Support README
 
 This is the README for vs code extension "YASKAWA Markup Language (YML) Support". 
 
