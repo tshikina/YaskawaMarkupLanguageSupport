@@ -19,6 +19,9 @@ Please see the [thirdparty](thirdparty/README.md) folder about third-party softw
 
 ## Release Notes
 
+### [0.2.0]
+Added Go To Definition for YML Item.
+
 ### [0.1.0]
 Added YML snippets.
 

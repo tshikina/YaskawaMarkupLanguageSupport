@@ -12,6 +12,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 ### Security
 
+## [0.2.0] - 2022-07-17
+### Added
+- Added Go To Definition for YML Item.
+
 ## [0.1.0] - 2022-04-10
 ### Added
 - Added syntax highlight of "parent" value
