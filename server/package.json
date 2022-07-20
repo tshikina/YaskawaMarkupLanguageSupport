@@ -1,7 +1,7 @@
 {
 	"name": "yaskawa-markup-language-support-server",
 	"description": "Support YML for Smart Pendant Extension server in node.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"author": "Taku Shikina",
 	"engines": {
 		"node": "*"
