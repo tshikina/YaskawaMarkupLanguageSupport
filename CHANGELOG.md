@@ -12,7 +12,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 ### Security
 
+## [0.2.1] - 2022-07-20
 ### Fixed
+- Improve lunching extension time
 - Fixed crashing extension server in Linux
 
 ## [0.2.0] - 2022-07-17
