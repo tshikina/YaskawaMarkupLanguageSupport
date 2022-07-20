@@ -12,6 +12,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 ### Security
 
+### Fixed
+- Fixed crashing extension server in Linux
+
 ## [0.2.0] - 2022-07-17
 ### Added
 - Added Go To Definition for YML Item.

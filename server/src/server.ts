@@ -94,11 +94,11 @@ async function searchDirectory( directoryPath: string ) {
 		if( file.isFile() ) {
 			if( file.name.toLowerCase().endsWith(".yml") ) {
 				console.log("file name: '" + file.name );
-				updateYmlItem(directoryPath + "\\" + file.name);
+				updateYmlItem(directoryPath + "/" + file.name);
 			}
 		}
 		else if( file.isDirectory() ) {
-			searchDirectory( directoryPath + "\\" + file.name );
+			searchDirectory( directoryPath + "/" + file.name );
 		}
 	} );
 }
@@ -296,26 +296,33 @@ async function updateYmlItem(ymlPath: string): Promise<void> {
 
 	console.log("updateYmlItem: " + ymlPath);
 
-	const text = fs.readFileSync( ymlPath, "utf-8" );
+	try{
+		const text = fs.readFileSync( ymlPath, "utf-8" );
 
-	const lines = text.replace("\r\n","\n").split("\n");
+		const lines = text.replace("\r\n","\n").split("\n");
+	
+		lines?.forEach( (line, lineNo) => {
+			// e.g.) MyUtility : Utility
+			const pattern = /(^|\s)([A-Z][A-Za-z0-9_]*)\s*:\s*([A-Z][A-Za-z0-9_]*)($|\s)/g;
+			let m: RegExpExecArray | null;
+			while ((m = pattern.exec(line)) ) {
+				console.log("new yml item found: '" + m[2] + "', '" + m[3] + "'" + " lineNo: " + lineNo );
+				itemMap.set( m[2], {
+					itemName: m[2], 
+					uri: URI.file(ymlPath).toString(),
+					range: Range.create( lineNo, m.index, lineNo, m.index + m[2].length ),
+					description: m[3]
+				} );
+				
+			}
+	
+		} );
+	
+	}
+	catch(err) {
+		console.log("cannot read file: " + ymlPath);
+	}
 
-	lines?.forEach( (line, lineNo) => {
-		// e.g.) MyUtility : Utility
-		const pattern = /(^|\s)([A-Z][A-Za-z0-9_]*)\s*:\s*([A-Z][A-Za-z0-9_]*)($|\s)/g;
-		let m: RegExpExecArray | null;
-		while ((m = pattern.exec(line)) ) {
-			console.log("new yml item found: '" + m[2] + "', '" + m[3] + "'" + " lineNo: " + lineNo );
-			itemMap.set( m[2], {
-				itemName: m[2], 
-				uri: URI.file(ymlPath).toString(),
-				range: Range.create( lineNo, m.index, lineNo, m.index + m[2].length ),
-				description: m[3]
-			} );
-			
-		}
-
-	} );
 
 }
 
