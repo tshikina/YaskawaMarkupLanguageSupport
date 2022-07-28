@@ -126,11 +126,24 @@ interface ExampleSettings {
 	maxNumberOfProblems: number;
 }
 
+interface YmlItemId {
+	idName: string,
+	uri: string,
+	range: Range
+}
+
 interface YmlItem {
 	itemName: string,
 	uri: string,
 	range: Range,
-	description: string
+	description: string,
+
+	idMap: Map<string, YmlItemId>
+}
+
+
+interface YmlFile {
+	items: Map<string, YmlItem>
 }
 
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
@@ -286,7 +299,8 @@ documents.onDidChangeContent(change => {
 // 	["CheckBox", "A selectable option (binary checked/unchecked) with optional label text."],
 // 	["RadioButton", "A selectable option (binary checked/unchecked) with optional label text. Typically used to select one option from a set of options. When multiple radio buttons are under the same parent, only one of them can be checked at any given time."],
 // ]);
-const itemMap = new Map<string, YmlItem>();
+const fileMap = new Map<string, YmlFile>(); // <path, YmlFile>
+const itemMap = new Map<string, YmlItem>(); // <Item, YmlItem>
 
 async function updateYmlItemText( textDocument: TextDocument ) {
 	updateYmlItem( URI.parse( textDocument.uri).fsPath );
@@ -294,29 +308,63 @@ async function updateYmlItemText( textDocument: TextDocument ) {
 
 async function updateYmlItem(ymlPath: string): Promise<void> {
 
+	ymlPath = ymlPath.replace(/\\/g, "/");
 	console.log("updateYmlItem: " + ymlPath);
 
 	try{
+		const fileItemMap = new Map<string, YmlItem>(); // <path, item>
 		const text = fs.readFileSync( ymlPath, "utf-8" );
 
 		const lines = text.replace("\r\n","\n").split("\n");
+		let newItemName = "";
 	
+		// User-defined Item
+		// e.g.) MyUtility : Utility
+		const itemPattern = /(?<=^|\s)([A-Z][A-Za-z0-9_]*)\s*:\s*([A-Z][A-Za-z0-9_]*)(?=$|\s)/g;
+
+		// Item id
+		// e.g.) id: itemId
+		const newIdPattern = /(?<=\s|^)id\s*:\s*([a-z][A-Za-z0-9_]*)(?=$|\s)/g;
+
+		const newItemURI: string = URI.file(ymlPath).toString();
+
+		let ymlItem: YmlItem | null = null;
+
 		lines?.forEach( (line, lineNo) => {
-			// e.g.) MyUtility : Utility
-			const pattern = /(^|\s)([A-Z][A-Za-z0-9_]*)\s*:\s*([A-Z][A-Za-z0-9_]*)($|\s)/g;
 			let m: RegExpExecArray | null;
-			while ((m = pattern.exec(line)) ) {
-				console.log("new yml item found: '" + m[2] + "', '" + m[3] + "'" + " lineNo: " + lineNo );
-				itemMap.set( m[2], {
-					itemName: m[2], 
-					uri: URI.file(ymlPath).toString(),
-					range: Range.create( lineNo, m.index, lineNo, m.index + m[2].length ),
-					description: m[3]
-				} );
-				
+			while ((m = itemPattern.exec(line)) ) {
+				console.log("new yml item found: '" + m[1] + "', '" + m[2] + "'" + " lineNo: " + lineNo );
+				newItemName = m[1];
+				ymlItem = {
+					itemName: newItemName, 
+					uri: newItemURI,
+					range: Range.create( lineNo, m.index, lineNo, m.index + m[0].length ),
+					description: m[2],
+					idMap: new Map<string, YmlItemId>()
+				};
+				itemMap.set( newItemName, ymlItem );
+				fileItemMap.set( newItemURI, ymlItem );
+			}
+
+			while((m = newIdPattern.exec(line))) {
+				const newIdName = m[1];
+				console.log("new id found: '" + newIdName + "'");
+				// console.log("m: '" + m + "' " + m.index);
+				const itemId = {
+					idName: newIdName,
+					uri: newItemURI,
+					range: Range.create( lineNo, m.index, lineNo, m.index + m[0].length )
+				};
+				if( ymlItem != null ) {
+					ymlItem.idMap.set( newIdName, itemId );
+				}
 			}
 	
 		} );
+
+		fileMap.set( ymlPath, {
+			items: fileItemMap
+		});
 	
 	}
 	catch(err) {
@@ -369,18 +417,30 @@ connection.onDefinition(
 		const document = documents.get(definitionParams.textDocument.uri);
 		const pos = definitionParams.position;
 		const lineRange = Range.create( pos.line, 0, pos.line+1, 0 );
+	
+		const ymlPath = URI.parse( definitionParams.textDocument.uri ).fsPath.replace( /\\/g, "/" );
+		const ymlFile = fileMap.get( ymlPath );
+
+		if( ymlFile != null ) {
+			console.log( "yml file found: " + ymlPath);
+		}
+		else {
+			console.log( "yml file NOT found: " + ymlPath);
+		}
 
 		let lineText: string;
 		
 		if(document != null)
 		{
 			lineText = document.getText( lineRange );
-			const pattern = /\b[A-Z][A-Za-z0-9_]+\b/g;
+			const itemPattern = /\b[A-Z][A-Za-z0-9_]+\b/g;
+			const idPattern = /(^|\s|:)([a-z][A-Za-z0-9_]*)\b/g;
 
 			let m: RegExpExecArray | null;
 			const posInLine = pos.character - lineRange.start.character;
 
-			while ((m = pattern.exec(lineText)) ) {
+			// search Item
+			while ((m = itemPattern.exec(lineText)) ) {
 				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
 				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
 					continue;
@@ -394,6 +454,38 @@ connection.onDefinition(
 						range: ymlItem.range //Range.create(0,0,0,0)
 					};
 				}
+			}
+
+			// search id
+			while ((m = idPattern.exec(lineText)) ) {
+				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
+				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
+					continue;
+				}
+				const itemId = m[2];
+
+				let ymlItem: YmlItem | null = null;
+				let startLine = 0;
+				if(ymlFile!=null) {
+					for( const [itemName, item] of ymlFile.items ) {
+						if( item.range.start.line < pos.line
+							&& item.range.start.line >= startLine ) {
+								startLine = item.range.start.line;
+								ymlItem = item;
+							}
+					}
+	
+					const idData = ymlItem?.idMap.get( itemId );
+					if(idData != undefined) {
+						console.log("uri: " + idData.uri);
+						return {
+							uri: idData.uri,
+							range: idData.range //Range.create(0,0,0,0)
+						};
+					}	
+				}
+
+
 			}
 	
 		}
