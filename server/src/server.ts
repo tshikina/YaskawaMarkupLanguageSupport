@@ -128,7 +128,11 @@ interface ExampleSettings {
 
 interface YmlItemId {
 	idName: string,
-	uri: string,
+	range: Range
+}
+
+interface YmlItemProperty {
+	propertyName: string,
 	range: Range
 }
 
@@ -139,6 +143,7 @@ interface YmlItem {
 	description: string,
 
 	idMap: Map<string, YmlItemId>
+	propertyMap: Map<string, YmlItemProperty>
 }
 
 
@@ -325,6 +330,10 @@ async function updateYmlItem(ymlPath: string): Promise<void> {
 		// Item id
 		// e.g.) id: itemId
 		const newIdPattern = /(?<=\s|^)id\s*:\s*([a-z][A-Za-z0-9_]*)(?=$|\s)/g;
+		
+		// Item property
+		// e.g.) property int itemspacing: 8
+		const newPropertyPattern = /(?<=\s|^)property\s+(bool|int|real|string|map|array|alias)\s+([a-z][A-Za-z0-9_]+)\s*:\s*([^;\r\n]+)(?=$|;)/g;
 
 		const newItemURI: string = URI.file(ymlPath).toString();
 
@@ -332,6 +341,8 @@ async function updateYmlItem(ymlPath: string): Promise<void> {
 
 		lines?.forEach( (line, lineNo) => {
 			let m: RegExpExecArray | null;
+
+			// search new Item
 			while ((m = itemPattern.exec(line)) ) {
 				console.log("new yml item found: '" + m[1] + "', '" + m[2] + "'" + " lineNo: " + lineNo );
 				newItemName = m[1];
@@ -340,12 +351,14 @@ async function updateYmlItem(ymlPath: string): Promise<void> {
 					uri: newItemURI,
 					range: Range.create( lineNo, m.index, lineNo, m.index + m[0].length ),
 					description: m[2],
-					idMap: new Map<string, YmlItemId>()
+					idMap: new Map<string, YmlItemId>(),
+					propertyMap: new Map<string, YmlItemProperty>()
 				};
 				itemMap.set( newItemName, ymlItem );
 				fileItemMap.set( newItemURI, ymlItem );
 			}
 
+			// search new id
 			while((m = newIdPattern.exec(line))) {
 				const newIdName = m[1];
 				console.log("new id found: '" + newIdName + "'");
@@ -359,7 +372,22 @@ async function updateYmlItem(ymlPath: string): Promise<void> {
 					ymlItem.idMap.set( newIdName, itemId );
 				}
 			}
-	
+			
+			// search new property
+			while((m = newPropertyPattern.exec(line))) {
+				const newPropertyName = m[2];
+				console.log("new property found: '" + newPropertyName + "'");
+
+				const itemProperty = {
+					propertyName: newPropertyName,
+					uri: newItemURI,
+					range: Range.create( lineNo, m.index, lineNo, m.index + m[0].length )
+				};
+				if( ymlItem != null ) {
+					ymlItem.propertyMap.set( newPropertyName, itemProperty );
+				}
+
+			}
 		} );
 
 		fileMap.set( ymlPath, {
@@ -435,6 +463,7 @@ connection.onDefinition(
 			lineText = document.getText( lineRange );
 			const itemPattern = /\b[A-Z][A-Za-z0-9_]+\b/g;
 			const idPattern = /(^|\s|:)([a-z][A-Za-z0-9_]*)\b/g;
+			const propertyPattern = /\b([a-z][A-Za-z0-9_]*)\b/g;
 
 			let m: RegExpExecArray | null;
 			const posInLine = pos.character - lineRange.start.character;
@@ -476,18 +505,46 @@ connection.onDefinition(
 					}
 	
 					const idData = ymlItem?.idMap.get( itemId );
-					if(idData != undefined) {
-						console.log("uri: " + idData.uri);
+					if(idData != undefined && ymlItem != undefined) {
+						console.log("uri: " + ymlItem.uri,);
 						return {
-							uri: idData.uri,
+							uri: ymlItem.uri,
 							range: idData.range //Range.create(0,0,0,0)
 						};
 					}	
 				}
-
-
 			}
+
+			// search properety
+			while ((m = propertyPattern.exec(lineText)) ) {
+				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
+				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
+					continue;
+				}
+				const propertyName = m[1];
+
+				let ymlItem: YmlItem | null = null;
+				let startLine = 0;
+				if(ymlFile!=null) {
+					for( const [itemName, item] of ymlFile.items ) {
+						if( item.range.start.line < pos.line
+							&& item.range.start.line >= startLine ) {
+								startLine = item.range.start.line;
+								ymlItem = item;
+							}
+					}
 	
+					const itemProperty = ymlItem?.propertyMap.get( propertyName );
+					if(itemProperty != undefined && ymlItem != undefined) {
+						console.log("uri: " + ymlItem.uri);
+						return {
+							uri: ymlItem.uri,
+							range: itemProperty.range
+						};
+					}	
+				}
+			}
+			
 		}
 
 	
