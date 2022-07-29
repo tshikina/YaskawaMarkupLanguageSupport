@@ -65,14 +65,14 @@
 			"name": "entity.name.type.class.yml"
 		},
 		"newproperty": {
-			"match": "\\b(property\\s+(bool|int|real|string|map|array))\\s+(\\S+)\\s*:",
+			"match": "(?<=\\s|^)(property\\s+(bool|int|real|string|map|array|alias))\\s+([a-z][A-Za-z0-9_]+)\\s*:",
 			"captures": {
 				"1": { "name": "storage.type.yml" },
 				"3": { "patterns": [{"include": "#propertyname"}] }
 			}
 		},
 		"newid": {
-			"match": "\\b(id)\\s*:\\s*(\\S+)\\b",
+			"match": "\\b(id)\\s*:\\s*([a-z][A-Za-z0-9_]+)\\b",
 			"captures": {
 				"1": { "name": "storage.type.yml" },
 				"2": { "patterns": [{"include": "#propertyname"}] }
