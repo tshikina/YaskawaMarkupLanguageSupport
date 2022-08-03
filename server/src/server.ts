@@ -21,6 +21,7 @@ import {
 	Range,
 	WorkspaceFolder,
 	Definition,
+	Location,
 } from 'vscode-languageserver/node';
 
 import {
@@ -92,9 +93,14 @@ async function searchDirectory( directoryPath: string ) {
 
 	files?.forEach( (file) => {
 		if( file.isFile() ) {
-			if( file.name.toLowerCase().endsWith(".yml") ) {
+			const fileName = file.name.toLowerCase();
+			if( fileName.endsWith(".yml") ) {
 				console.log("file name: '" + file.name );
 				updateYmlItem(directoryPath + "/" + file.name);
+			}
+			else if( fileName.endsWith(".properties")) {
+				console.log("file name: '" + file.name );
+				updateLangProperty( directoryPath + "/" + file.name );
 			}
 		}
 		else if( file.isDirectory() ) {
@@ -146,6 +152,10 @@ interface YmlItem {
 	propertyMap: Map<string, YmlItemProperty>
 }
 
+interface LangProperty {
+	property: string,
+	range: Range
+}
 
 interface YmlFile {
 	items: Map<string, YmlItem>
@@ -306,6 +316,7 @@ documents.onDidChangeContent(change => {
 // ]);
 const fileMap = new Map<string, YmlFile>(); // <path, YmlFile>
 const itemMap = new Map<string, YmlItem>(); // <Item, YmlItem>
+const translationMap = new Map<string, Map<string, LangProperty>>(); // trkey, filePath, content
 
 async function updateYmlItemText( textDocument: TextDocument ) {
 	updateYmlItem( URI.parse( textDocument.uri).fsPath );
@@ -398,7 +409,55 @@ async function updateYmlItem(ymlPath: string): Promise<void> {
 	catch(err) {
 		console.log("cannot read file: " + ymlPath);
 	}
+}
 
+function getLangFromPath( filePath: string) {
+	let lang : string | undefined;
+
+	const langPattern = /_(\S{2}).properties$/;
+	let m: RegExpExecArray | null;
+	
+	if ((m = langPattern.exec(filePath))) {
+		lang = m[1];
+	}
+
+	return lang;
+}
+
+function updateLangProperty( filePath: string ) {
+	filePath = filePath.replace(/\\/g, "/");
+	console.log("updateLangProperty : " + filePath);
+
+	const text = fs.readFileSync( filePath, "utf-8" );
+
+	const lines = text.replace("\r\n","\n").split("\n");
+
+	const fileURI: string = URI.file(filePath).toString();
+
+
+	lines.forEach( (line, lineNo) => {
+		const propertyPattern = /^\s*([^#][^=\s]+)\s*=\s*(.*?)\s*$/;
+		let m: RegExpExecArray | null;
+		
+		if ((m = propertyPattern.exec(line))) {
+			const key = m[1];
+			const properety = m[2];
+
+			console.log("new lang property found: '" + key + "' : " + properety);
+
+			let keyProperties = translationMap.get( key );
+
+			if( !keyProperties ) {
+				keyProperties = new Map<string, LangProperty>();
+				translationMap.set( key, keyProperties );
+			}
+
+			keyProperties.set( filePath, {
+				property: properety,
+				range: Range.create( lineNo, m.index, lineNo, m.index + m[0].length )
+			});
+		}
+	});
 
 }
 
@@ -461,12 +520,44 @@ connection.onDefinition(
 		if(document != null)
 		{
 			lineText = document.getText( lineRange );
+			const trPattern = /\btr\(\s*('([^']*)'|"([^"]*)")[^\\)]*\)/g;
 			const itemPattern = /\b[A-Z][A-Za-z0-9_]+\b/g;
 			const idPattern = /(^|\s|:)([a-z][A-Za-z0-9_]*)\b/g;
 			const propertyPattern = /\b([a-z][A-Za-z0-9_]*)\b/g;
 
 			let m: RegExpExecArray | null;
 			const posInLine = pos.character - lineRange.start.character;
+
+			// search tr()
+			while ((m = trPattern.exec(lineText)) ) {
+				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
+					continue;
+				}
+				let key: string | undefined;
+				if( m[2] ) {
+					key = m[2];
+				}
+				else {
+					key = m[3];
+				}
+				
+				const definitions : Location[] = new Array(0);
+
+				const keyMap = translationMap.get(key);
+
+				if( keyMap ) {
+					for( const [filePath, property] of keyMap ) {
+						definitions.push( {
+							uri: URI.file(filePath).toString(),
+							range: property.range
+						} );
+					}
+				}
+
+				if( definitions.length > 0) {
+					return definitions;
+				}
+			}
 
 			// search Item
 			while ((m = itemPattern.exec(lineText)) ) {
