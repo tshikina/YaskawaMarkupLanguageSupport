@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## [0.3.0] - 2022-08-08
 ### Added
 - Added syntax highlight of alias property.
 - Added Go To Definition for item id.
