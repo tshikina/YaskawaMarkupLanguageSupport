@@ -3,7 +3,10 @@
 ## [Unreleased]
 ### Added
 - Added syntax highlight of alias property.
+- Added Go To Definition for item id.
+- Added Go To Definition for item property.
 - Added Go To Definition for translation properties.
+- Added Hover for translation properties.
 
 ## [0.2.1] - 2022-07-20
 ### Fixed

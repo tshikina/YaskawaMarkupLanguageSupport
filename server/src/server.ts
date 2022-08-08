@@ -33,6 +33,22 @@ import * as fs from "fs";
 import path = require('path');
 import { MochaInstanceOptions } from 'mocha';
 
+function createItemPattern() {
+	return /\b[A-Z][A-Za-z0-9_]+\b/g;
+}
+
+function createPropertyPattern() {
+	return /\b([a-z][A-Za-z0-9_]*)\b/g;
+}
+
+function createTrPattern() {
+	return /\btr\(\s*('([^']*)'|"([^"]*)")[^)]*\)/g;
+}
+
+function createIdPattern() {
+	return /(^|\s|:)([a-z][A-Za-z0-9_]*)\b/g;
+}
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -441,9 +457,9 @@ function updateLangProperty( filePath: string ) {
 		
 		if ((m = propertyPattern.exec(line))) {
 			const key = m[1];
-			const properety = m[2];
+			const property = m[2];
 
-			console.log("new lang property found: '" + key + "' : " + properety);
+			// console.log("new lang property found: '" + key + "' : " + property);
 
 			let keyProperties = translationMap.get( key );
 
@@ -453,7 +469,7 @@ function updateLangProperty( filePath: string ) {
 			}
 
 			keyProperties.set( filePath, {
-				property: properety,
+				property: property,
 				range: Range.create( lineNo, m.index, lineNo, m.index + m[0].length )
 			});
 		}
@@ -473,12 +489,45 @@ connection.onHover(
 		if(document != null)
 		{
 			lineText = document.getText( lineRange );
-			const pattern = /\b[A-Z][A-Za-z0-9_]+\b/g;
 
 			let m: RegExpExecArray | null;
 			const posInLine = pos.character - lineRange.start.character;
 
-			while ((m = pattern.exec(lineText)) ) {
+			// search tr()
+			const trPattern = createTrPattern();
+			while ((m = trPattern.exec(lineText)) ) {
+				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
+					continue;
+				}
+				let key: string | undefined;
+				if( m[2] ) {
+					key = m[2];
+				}
+				else {
+					key = m[3];
+				}
+				
+				const keyMap = translationMap.get(key);
+				// MarkdownString
+
+				if( keyMap ) {
+					let description = "| Lang|Translation |\n| ----: | :---- |\n";
+					for( const [filePath, property] of keyMap ) {
+						const lang = getLangFromPath(filePath);
+						description += `| [${lang}]|${property.property} |\n`;
+					}
+					return {
+						contents: {
+							kind: 'markdown',
+							value: description
+						}
+					};
+				}
+			}
+			
+			// search Item
+			const itemPattern = createItemPattern();
+			while ((m = itemPattern.exec(lineText)) ) {
 				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
 				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
 					continue;
@@ -508,27 +557,28 @@ connection.onDefinition(
 		const ymlPath = URI.parse( definitionParams.textDocument.uri ).fsPath.replace( /\\/g, "/" );
 		const ymlFile = fileMap.get( ymlPath );
 
-		if( ymlFile != null ) {
-			console.log( "yml file found: " + ymlPath);
-		}
-		else {
-			console.log( "yml file NOT found: " + ymlPath);
-		}
+		// console.log( `definition pos = ${pos.line}, ${pos.character}` );
+
+		// if( ymlFile != null ) {
+		// 	console.log( "yml file found: " + ymlPath);
+		// }
+		// else {
+		// 	console.log( "yml file NOT found: " + ymlPath);
+		// }
 
 		let lineText: string;
 		
 		if(document != null)
 		{
 			lineText = document.getText( lineRange );
-			const trPattern = /\btr\(\s*('([^']*)'|"([^"]*)")[^\\)]*\)/g;
-			const itemPattern = /\b[A-Z][A-Za-z0-9_]+\b/g;
-			const idPattern = /(^|\s|:)([a-z][A-Za-z0-9_]*)\b/g;
-			const propertyPattern = /\b([a-z][A-Za-z0-9_]*)\b/g;
-
 			let m: RegExpExecArray | null;
 			const posInLine = pos.character - lineRange.start.character;
 
+			// console.log( `lineText: ${lineText}`);
+
+
 			// search tr()
+			const trPattern = createTrPattern();
 			while ((m = trPattern.exec(lineText)) ) {
 				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
 					continue;
@@ -560,6 +610,7 @@ connection.onDefinition(
 			}
 
 			// search Item
+			const itemPattern = createItemPattern();
 			while ((m = itemPattern.exec(lineText)) ) {
 				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
 				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
@@ -577,12 +628,15 @@ connection.onDefinition(
 			}
 
 			// search id
+			const idPattern = createIdPattern();
 			while ((m = idPattern.exec(lineText)) ) {
 				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
 				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
 					continue;
 				}
 				const itemId = m[2];
+
+				// console.log(`found itemId: ${itemId}`);
 
 				let ymlItem: YmlItem | null = null;
 				let startLine = 0;
@@ -606,7 +660,8 @@ connection.onDefinition(
 				}
 			}
 
-			// search properety
+			// search property
+			const propertyPattern = createPropertyPattern();
 			while ((m = propertyPattern.exec(lineText)) ) {
 				//console.log( m[0] + " index: " + m.index + "length: " + m[0].length + " pos:" + posInLine );
 				if( posInLine < m.index || m.index + m[0].length < posInLine ) {
