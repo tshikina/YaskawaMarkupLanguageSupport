@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4.0] - 2023-10-15
+### Added
+- Added GoToPositionButton snippets for YML Item.
+
 ## [0.3.0] - 2022-08-08
 ### Added
 - Added syntax highlight of alias property.
