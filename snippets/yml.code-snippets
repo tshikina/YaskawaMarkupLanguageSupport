@@ -453,6 +453,20 @@
         ],
         "description": "PieChart item"
     },
+    "GoToPositionButton item": {
+        "prefix": "GoToPositionButton {}",
+        "body": [
+            "GoToPositionButton {",
+            "\tid: ${1:${TM_FILENAME_BASE/(.*)/${1:/camelcase}/}GoToPositionButton${RANDOM}}",
+            "\tjogMode: 0",
+            "\ttarget: [0,0,0,0,0,0]",
+            "\ttext: \"${1:Button Label}\"",
+            "\trequiredServo: Const.On",
+            "\t$0",
+            "}",
+        ],
+        "description": "GoToPositionButton"
+    },
 
     "Utility item": {
         "prefix": "Utility {}",
